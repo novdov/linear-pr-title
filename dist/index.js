@@ -53,7 +53,6 @@ function run() {
             const updatedPr = yield (0, updater_1.updatePrTitle)({
                 octokit,
                 linearClient,
-                branchName: github.context.ref,
                 branchFormat,
                 owner,
                 repo,
@@ -163,17 +162,23 @@ const core = __importStar(__nccwpck_require__(2186));
 const getPrTitle = (linearIssue) => {
     return `${linearIssue.id} ${linearIssue.title}`;
 };
-const updatePrTitle = ({ octokit, linearClient, branchName, branchFormat, owner, repo, pullNumber }) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id: linearIssueId } = (0, parser_1.parseBranchName)(branchName, branchFormat);
-    core.debug(`${branchName}, ${branchFormat}, ${linearIssueId}`);
+const updatePrTitle = ({ octokit, linearClient, branchFormat, owner, repo, pullNumber }) => __awaiter(void 0, void 0, void 0, function* () {
+    const { data: retrievedPr } = yield octokit.rest.pulls.get({
+        owner,
+        repo,
+        pull_number: pullNumber
+    });
+    const { ref } = retrievedPr.head;
+    core.info(`Ref: ${retrievedPr.head.ref}`);
+    const { id: linearIssueId } = (0, parser_1.parseBranchName)(ref, branchFormat);
     const linearIssue = yield linearClient.issue(linearIssueId);
-    const { data } = yield octokit.rest.pulls.update({
+    const { data: updatedPr } = yield octokit.rest.pulls.update({
         owner,
         repo,
         pull_number: pullNumber,
         title: getPrTitle(linearIssue)
     });
-    return data;
+    return updatedPr;
 });
 exports.updatePrTitle = updatePrTitle;
 

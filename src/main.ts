@@ -20,7 +20,6 @@ async function run(): Promise<void> {
     const updatedPr = await updatePrTitle({
       octokit,
       linearClient,
-      branchName: github.context.ref,
       branchFormat,
       owner,
       repo,

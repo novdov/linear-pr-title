@@ -7,7 +7,6 @@ import {Endpoints} from '@octokit/types'
 interface UpdatePrTitleParams {
   octokit: InstanceType<typeof GitHub>
   linearClient: LinearClient
-  branchName: string
   branchFormat: BranchFormat
   owner: string
   repo: string
@@ -24,23 +23,26 @@ type UpdatePullResponse =
 export const updatePrTitle = async ({
   octokit,
   linearClient,
-  branchName,
   branchFormat,
   owner,
   repo,
   pullNumber
 }: UpdatePrTitleParams): Promise<UpdatePullResponse['data']> => {
-  const {id: linearIssueId} = parseBranchName(branchName, branchFormat)
+  const {data: retrievedPr} = await octokit.rest.pulls.get({
+    owner,
+    repo,
+    pull_number: pullNumber
+  })
+  const {ref} = retrievedPr.head
+  core.info(`Ref: ${retrievedPr.head.ref}`)
 
-  core.debug(`${branchName}, ${branchFormat}, ${linearIssueId}`)
-
+  const {id: linearIssueId} = parseBranchName(ref, branchFormat)
   const linearIssue = await linearClient.issue(linearIssueId)
-
-  const {data} = await octokit.rest.pulls.update({
+  const {data: updatedPr} = await octokit.rest.pulls.update({
     owner,
     repo,
     pull_number: pullNumber,
     title: getPrTitle(linearIssue)
   })
-  return data
+  return updatedPr
 }
