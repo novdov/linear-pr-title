@@ -47,13 +47,12 @@ function run() {
         const branchFormat = core.getInput('branch-format');
         const octokit = github.getOctokit(token);
         const linearClient = new sdk_1.LinearClient({ apiKey: linearApiKey });
-        core.info(`Updating PR title of ${context.issue}`);
+        const { owner, repo, number } = context.issue;
+        core.info(`Updating PR title of ${owner}/${repo}: ${number}`);
         try {
-            const { owner, repo, number } = context.issue;
             const updatedPr = yield (0, updater_1.updatePrTitle)({
                 octokit,
                 linearClient,
-                branchName: github.context.ref,
                 branchFormat,
                 owner,
                 repo,
@@ -128,6 +127,25 @@ exports.parseBranchName = parseBranchName;
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -139,20 +157,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.updatePrTitle = void 0;
+const core = __importStar(__nccwpck_require__(2186));
 const parser_1 = __nccwpck_require__(267);
 const getPrTitle = (linearIssue) => {
-    return `${linearIssue.id} ${linearIssue.title}`;
+    return `${linearIssue.identifier} ${linearIssue.title}`;
 };
-const updatePrTitle = ({ octokit, linearClient, branchName, branchFormat, owner, repo, pullNumber }) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id: linearIssueId } = (0, parser_1.parseBranchName)(branchName, branchFormat);
+const updatePrTitle = ({ octokit, linearClient, branchFormat, owner, repo, pullNumber }) => __awaiter(void 0, void 0, void 0, function* () {
+    const { data: retrievedPr } = yield octokit.rest.pulls.get({
+        owner,
+        repo,
+        pull_number: pullNumber
+    });
+    const { ref } = retrievedPr.head;
+    core.info(`Ref: ${retrievedPr.head.ref}`);
+    const { id: linearIssueId } = (0, parser_1.parseBranchName)(ref, branchFormat);
     const linearIssue = yield linearClient.issue(linearIssueId);
-    const { data } = yield octokit.rest.pulls.update({
+    const { data: updatedPr } = yield octokit.rest.pulls.update({
         owner,
         repo,
         pull_number: pullNumber,
         title: getPrTitle(linearIssue)
     });
-    return data;
+    return updatedPr;
 });
 exports.updatePrTitle = updatePrTitle;
 
