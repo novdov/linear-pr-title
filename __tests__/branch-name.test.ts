@@ -1,5 +1,5 @@
-import {expect, test} from '@jest/globals'
-import {BranchFormat, LinearIssueComponent, parseBranchName} from "../src/branch-format";
+import { expect, test } from "@jest/globals";
+import { BranchFormat, LinearIssueComponent, parseBranchName } from "../src/parser";
 
 test.each([
   ['user-name-id-123-issue title', BranchFormat.usernameIdentifierTitle, {identifier: 'id-123'}],
