@@ -1,11 +1,16 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'Linear PR Title'
+description: 'Update PR title to Linear issue {id} {title}'
+author: 'novdov'
 inputs:
-  milliseconds: # change this
+  gh-token: # change this
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'Github auth token'
+  linear-api-key:
+    required: true
+    description: 'Linear API key'
+  branch-format:
+    required: false
+    description: 'Branch format used by Linear Github integration'
 runs:
   using: 'node16'
   main: 'dist/index.js'

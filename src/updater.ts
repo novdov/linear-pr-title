@@ -1,6 +1,7 @@
 import {BranchFormat, parseBranchName} from './parser'
 import {Issue, LinearClient} from '@linear/sdk'
 import {GitHub} from '@actions/github/lib/utils'
+import {Endpoints} from '@octokit/types'
 
 interface UpdatePrTitleParams {
   octokit: InstanceType<typeof GitHub>
@@ -16,6 +17,9 @@ const getPrTitle = (linearIssue: Issue): string => {
   return `${linearIssue.id} ${linearIssue.title}`
 }
 
+type UpdatePullResponse =
+  Endpoints['PATCH /repos/{owner}/{repo}/pulls/{pull_number}']['response']
+
 export const updatePrTitle = async ({
   octokit,
   linearClient,
@@ -24,7 +28,7 @@ export const updatePrTitle = async ({
   owner,
   repo,
   pullNumber
-}: UpdatePrTitleParams) => {
+}: UpdatePrTitleParams): Promise<UpdatePullResponse['data']> => {
   const {id: linearIssueId} = parseBranchName(branchName, branchFormat)
   const linearIssue = await linearClient.issue(linearIssueId)
 
