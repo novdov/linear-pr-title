@@ -1,4 +1,5 @@
 import {BranchFormat, parseBranchName} from './parser'
+import * as core from '@actions/core'
 import {Issue, LinearClient} from '@linear/sdk'
 import {GitHub} from '@actions/github/lib/utils'
 import {Endpoints} from '@octokit/types'
@@ -30,6 +31,9 @@ export const updatePrTitle = async ({
   pullNumber
 }: UpdatePrTitleParams): Promise<UpdatePullResponse['data']> => {
   const {id: linearIssueId} = parseBranchName(branchName, branchFormat)
+
+  core.debug(`${branchName}, ${branchFormat}, ${linearIssueId}`)
+
   const linearIssue = await linearClient.issue(linearIssueId)
 
   const {data} = await octokit.rest.pulls.update({
