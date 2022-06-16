@@ -13,7 +13,7 @@ async function run(): Promise<void> {
   const octokit = github.getOctokit(token)
   const linearClient = new LinearClient({apiKey: linearApiKey})
 
-  core.info(`Updating PR title of ${context.issue}`)
+  core.info(`Updating PR title of ${context.repo}: ${context.issue.number}`)
 
   try {
     const {owner, repo, number} = context.issue
