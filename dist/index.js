@@ -47,7 +47,7 @@ function run() {
         const branchFormat = core.getInput('branch-format');
         const octokit = github.getOctokit(token);
         const linearClient = new sdk_1.LinearClient({ apiKey: linearApiKey });
-        core.info(`Updating PR title of ${context.issue}`);
+        core.info(`Updating PR title of ${context.repo}: ${context.issue.number}`);
         try {
             const { owner, repo, number } = context.issue;
             const updatedPr = yield (0, updater_1.updatePrTitle)({
