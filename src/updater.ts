@@ -14,7 +14,7 @@ interface UpdatePrTitleParams {
 }
 
 const getPrTitle = (linearIssue: Issue): string => {
-  return `${linearIssue.id} ${linearIssue.title}`
+  return `${linearIssue.identifier} ${linearIssue.title}`
 }
 
 type UpdatePullResponse =

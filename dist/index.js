@@ -160,7 +160,7 @@ exports.updatePrTitle = void 0;
 const parser_1 = __nccwpck_require__(267);
 const core = __importStar(__nccwpck_require__(2186));
 const getPrTitle = (linearIssue) => {
-    return `${linearIssue.id} ${linearIssue.title}`;
+    return `${linearIssue.identifier} ${linearIssue.title}`;
 };
 const updatePrTitle = ({ octokit, linearClient, branchFormat, owner, repo, pullNumber }) => __awaiter(void 0, void 0, void 0, function* () {
     const { data: retrievedPr } = yield octokit.rest.pulls.get({
